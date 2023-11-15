@@ -1,0 +1,84 @@
+services:
+    server:
+        build:
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+            args:
+                - NGINX_CONF_FILE=${NGINX_CONF:-./docker/nginx/laravel.conf}
+        volumes:
+            - ./public:/var/www/html/public
+            - ./docker/nginx/laravel.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - '${APP_PORT:-80}:80'
+        depends_on:
+            - laravel
+
+    laravel:
+        build:
+            context: .
+            dockerfile: docker/laravel/Dockerfile
+            args:
+                - GID=${GID:-1000}
+                - UID=${UID:-1000}
+        environment:
+            LARAVEL_SAIL: 1
+        user: laravel
+        volumes:
+            - '.:/var/www/html'
+        command: [ "php", "/var/www/html/bin/laravels", "start", "-i" ]
+        depends_on:
+            - postgres
+            - redis
+
+    postgres:
+        image: 'postgres:15'
+        ports:
+            - '${FORWARD_DB_PORT:-5432}:5432'
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-secret}'
+            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+        volumes:
+            - 'pgsql:/var/lib/postgresql/data'
+        healthcheck:
+            test:
+                - CMD
+                - pg_isready
+                - '-q'
+                - '-d'
+                - '${DB_DATABASE}'
+                - '-U'
+                - '${DB_USERNAME}'
+            retries: 3
+            timeout: 5s
+
+    redis:
+        image: 'redis:alpine'
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'redis:/data'
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            retries: 3
+            timeout: 5s
+
+    horizon:
+        restart: unless-stopped
+        build:
+            context: ./docker/supervisor
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - redis
+            - laravel
+
+volumes:
+    pgsql:
+        driver: local
+    redis:
+        driver: local
