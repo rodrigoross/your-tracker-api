@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'tracker' => [
+        'url' => env('TRACKER_URL', 'https://api.linketrack.com'),
+        'user' => env('TRACKER_USER'),
+        'token' => env('TRACKER_TOKEN'),
+        'timeout' => env('TRACKER_TIMEOUT', 30),
+        'connect_timeout' => env('TRACKER_CONNECT_TIMEOUT', 2),
+    ],
 ];
