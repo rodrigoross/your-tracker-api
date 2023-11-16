@@ -4,20 +4,19 @@ namespace App\Services\Tracker\Entities;
 
 use App\Services\Tracker\Enums\TrackingStatus;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 
 class Tracker
 {
     public string $code;
     public string $host;
     public array $events;
-    public Carbon $updatedAt;
+    public Carbon $lastEventAt;
 
-    public function __construct(string $code, string $host, string $updatedAt, array $events)
+    public function __construct(string $code, string $host, string $lastEventAt, array $events)
     {
         $this->code = $code;
         $this->host = $host;
-        $this->updatedAt = Carbon::parse($updatedAt);
+        $this->lastEventAt = Carbon::parse($lastEventAt);
 
         $this->events = collect($events)
             ->map(fn($event) => new Event(

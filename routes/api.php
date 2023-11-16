@@ -13,8 +13,14 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::post('/auth', [\App\Http\Controllers\Api\AuthenticateController::class, 'login'])->name('api.login');
-Route::post('/register', [\App\Http\Controllers\Api\AuthenticateController::class, 'register'])->name('api.register');
+Route::post('/auth', [\App\Http\Controllers\Api\AuthenticateController::class, 'login'])->name('login');
+Route::post('/register', [\App\Http\Controllers\Api\AuthenticateController::class, 'register'])->name('register');
+
+Route::prefix('v1')
+    ->name('v1.')
+    ->group(function () {
+       Route::get('/track', \App\Http\Controllers\TrackController::class)->name('track');
+    });
 
 Route::prefix('v1')
     ->name('v1.')
