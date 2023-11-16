@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('/auth', [\App\Http\Controllers\Api\AuthenticateController::class, 'login'])->name('api.login');
+Route::post('/register', [\App\Http\Controllers\Api\AuthenticateController::class, 'register'])->name('api.register');
 
 Route::prefix('v1')
     ->name('v1.')
