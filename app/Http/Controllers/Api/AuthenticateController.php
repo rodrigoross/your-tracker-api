@@ -32,24 +32,25 @@ class AuthenticateController extends Controller
             )
         ),
         tags: ['Authentication'],
-        responses: [new OA\Response(
-            response: 200,
-            description: 'Login successful',
-            content: new OA\JsonContent(
-                examples: [new OA\Examples(
-                    example: 'plainAccessToken',
-                    summary: 'Successful Login response',
-                    value: [
-                        "user" => [
-                            "name" => "Rodrigo",
-                            "email" => "p8jH6@example.com",
-                            "email_verified_at" => null,
-                        ],
-                        "plainTextToken" => "1|5oOt1FajQlwabQ4NRmODi3hxPgATzR4tsL9AQtSf47929443",
-                    ]
-                )],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Login successful',
+                content: new OA\JsonContent(
+                    examples: [new OA\Examples(
+                        example: 'plainAccessToken',
+                        summary: 'Successful Login response',
+                        value: [
+                            "user" => [
+                                "name" => "Rodrigo",
+                                "email" => "p8jH6@example.com",
+                                "email_verified_at" => null,
+                            ],
+                            "plainTextToken" => "1|5oOt1FajQlwabQ4NRmODi3hxPgATzR4tsL9AQtSf47929443",
+                        ]
+                    )],
+                ),
             ),
-        ),
             new OA\Response(
                 response: 422,
                 description: 'Validation errors',
@@ -63,7 +64,8 @@ class AuthenticateController extends Controller
                                 'device_name' => ['The device name field is required.'],]]
                     )]
                 )
-            ),]
+            ),
+        ]
     )]
     public function login(Request $request)
     {

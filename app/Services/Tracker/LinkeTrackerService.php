@@ -24,7 +24,7 @@ class LinkeTrackerService implements TrackerServiceInterface
         return new Tracker(
             code: $response['codigo'],
             host: $response['host'],
-            updatedAt: $response['ultimo'],
+            lastEventAt: $response['ultimo'],
             events: $response['eventos'],
         );
     }
