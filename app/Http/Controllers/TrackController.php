@@ -75,7 +75,6 @@ class TrackController extends Controller
     {
         try {
             return response()->json($service->track($request->query('code')));
-
         } catch (\TypeError $th) {
             return response()->json([
                 'message' => __('No package code provided'),
