@@ -34,33 +34,7 @@ class PackageController extends Controller
                 response: 200,
                 description: 'Successful listing of packages',
                 content: new OA\JsonContent(
-                    examples: [
-                        new OA\Examples(
-                            example: 'packagesCollection',
-                            summary: 'Successful listing of packages',
-                            description: 'List of packages',
-                            value: [
-                                'packages' => [
-                                    [
-                                        "code" => "NL718729417BR",
-                                        "icon" => "default",
-                                        "alias" => "My Package",
-                                        "host" => "your-tracker.com",
-                                        "lastEventAt" => "2022-08-01T00:00:00.000000Z",
-                                        "events" => [
-                                            [
-                                                "date" => "08/01/2022 00:00",
-                                                "location" => "São Paulo - SP",
-                                                "status" => "POSTED",
-                                                "message" => "Objeto postado",
-                                                "subStatus" => [],
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        )
-                    ]
+                    ref: '#/components/schemas/PackageCollection'
                 )
             ),
             new OA\Response(
@@ -94,30 +68,9 @@ class PackageController extends Controller
         responses: [
             new OA\Response(
                 response: 201,
-                description: 'Package favorited',
+                description: 'Package favorited successfully',
                 content: new OA\JsonContent(
-                    examples: [
-                        new OA\Examples(
-                            example: 'packageCreated',
-                            summary: 'Package favorited',
-                            description: 'Package favorited',
-                            value: [
-                                "code" => "NL718729417BR",
-                                "icon" => "default",
-                                "alias" => "NL718729417BR",
-                                "lastEventAt" => "2022-08-01T00:00:00.000000Z",
-                                "events" => [
-                                    [
-                                        "date" => "08/01/2022 00:00",
-                                        "location" => "São Paulo - SP",
-                                        "status" => "POSTED",
-                                        "message" => "Objeto postado",
-                                        "subStatus" => [],
-                                    ]
-                                ]
-                            ]
-                        )
-                    ]
+                    ref: '#/components/schemas/PackageResource',
                 )
             ),
             new OA\Response(
@@ -135,7 +88,7 @@ class PackageController extends Controller
                     examples: [
                         new OA\Examples(
                             example: 'validationError',
-                            summary: 'Validation error',
+                            summary: 'Validation store error',
                             description: 'Validation error',
                             value: [
                                 "message" => "The given data was invalid.",
@@ -211,7 +164,7 @@ class PackageController extends Controller
         parameters: [
             new OA\Parameter(
                 name: 'package',
-                description: 'Package code',
+                description: 'Tracking package code',
                 in: 'path',
                 required: true,
                 schema: new OA\Schema(description: 'Tracking package code', type: 'string', example: 'NL718729417BR'),
@@ -223,28 +176,7 @@ class PackageController extends Controller
                 response: 200,
                 description: 'Package updated',
                 content: new OA\JsonContent(
-                    examples: [
-                        new OA\Examples(
-                            example: 'packageUpdated',
-                            summary: 'Package meta information updated',
-                            description: 'Package metadata updated',
-                            value: [
-                                "code" => "NL718729417BR",
-                                "icon" => "clothing",
-                                "alias" => "My favorite package",
-                                "lastEventAt" => "2022-08-01T00:00:00.000000Z",
-                                "events" => [
-                                    [
-                                        "date" => "08/01/2022 00:00",
-                                        "location" => "São Paulo - SP",
-                                        "status" => "POSTED",
-                                        "message" => "Objeto postado",
-                                        "subStatus" => [],
-                                    ]
-                                ]
-                            ]
-                        )
-                    ]
+                    ref: '#/components/schemas/PackageResource',
                 )
             ),
             new OA\Response(
@@ -312,28 +244,7 @@ class PackageController extends Controller
                 response: 200,
                 description: 'Package',
                 content: new OA\JsonContent(
-                    examples: [
-                        new OA\Examples(
-                            example: 'package',
-                            summary: 'Package show',
-                            description: 'User package',
-                            value: [
-                                "code" => "NL718729417BR",
-                                "icon" => "clothing",
-                                "alias" => "My favorite package",
-                                "lastEventAt" => "2022-08-01T00:00:00.000000Z",
-                                "events" => [
-                                    [
-                                        "date" => "08/01/2022 00:00",
-                                        "location" => "São Paulo - SP",
-                                        "status" => "POSTED",
-                                        "message" => "Objeto postado",
-                                        "subStatus" => [],
-                                    ]
-                                ]
-                            ]
-                        )
-                    ]
+                    ref: '#/components/schemas/PackageResource',
                 )
             ),
             new OA\Response(

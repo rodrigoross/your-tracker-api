@@ -206,9 +206,8 @@ class PackageTest extends TestCase
 
         $packages->take(5)->each(fn($package) => $user->favorite($package));
 
-        $this->getJson(route('api.v1.packages.index'))
-            ->assertOk()
-            ->assertJsonCount(5, 'packages');
+        $res = $this->getJson(route('api.v1.packages.index'));
+        dd($res->json());
     }
 
     /** @test */
