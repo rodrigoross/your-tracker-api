@@ -27,6 +27,7 @@ class PackageController extends Controller
         operationId: 'v1.packages.index',
         description: 'Route to list user saved packages',
         summary: 'API middleware route to list user saved packages',
+        security: ['sanctum'],
         tags: ['Packages'],
         responses: [
             new OA\Response(
@@ -82,6 +83,7 @@ class PackageController extends Controller
         operationId: 'v1.packages.store',
         description: 'Route to favorite a package',
         summary: 'API middleware route to favorite a package',
+        security: ['sanctum'],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -188,6 +190,7 @@ class PackageController extends Controller
         operationId: 'v1.packages.update',
         description: 'Route to update a package meta information',
         summary: 'API middleware route to update a package meta information',
+        security: ['sanctum'],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -294,6 +297,7 @@ class PackageController extends Controller
         operationId: 'v1.packages.show',
         description: 'Route to show a package',
         summary: 'API middleware route to show a package',
+        security: ['sanctum'],
         tags: ['Packages'],
         parameters: [
             new OA\Parameter(
@@ -362,6 +366,7 @@ class PackageController extends Controller
         operationId: 'v1.packages.destroy',
         description: 'Route to unfavorite a package',
         summary: 'API middleware route to unfavorite a package',
+        security: ['sanctum'],
         tags: ['Packages'],
         parameters: [
             new OA\Parameter(
