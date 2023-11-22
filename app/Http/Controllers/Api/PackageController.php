@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PackageIcon;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePackageRequest;
 use App\Http\Requests\UpdatePackageRequest;
@@ -9,12 +10,64 @@ use App\Http\Resources\PackageCollection;
 use App\Http\Resources\PackageResource;
 use App\Models\Package;
 use App\Services\Tracker\Contracts\TrackerServiceInterface;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(
+    name: 'Packages',
+    description: 'Manage user saved packages',
+)]
 class PackageController extends Controller
 {
+    #[OA\Get(
+        path: '/api/v1/packages',
+        operationId: 'v1.packages.index',
+        description: 'Route to list user saved packages',
+        summary: 'API middleware route to list user saved packages',
+        tags: ['Packages'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful listing of packages',
+                content: new OA\JsonContent(
+                    examples: [
+                        new OA\Examples(
+                            example: 'packagesCollection',
+                            summary: 'Successful listing of packages',
+                            description: 'List of packages',
+                            value: [
+                                'packages' => [
+                                    [
+                                        "code" => "NL718729417BR",
+                                        "icon" => "default",
+                                        "alias" => "My Package",
+                                        "host" => "your-tracker.com",
+                                        "lastEventAt" => "2022-08-01T00:00:00.000000Z",
+                                        "events" => [
+                                            [
+                                                "date" => "08/01/2022 00:00",
+                                                "location" => "São Paulo - SP",
+                                                "status" => "POSTED",
+                                                "message" => "Objeto postado",
+                                                "subStatus" => [],
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            )
+        ]
+    )]
     public function index()
     {
         $this->authorize('viewAny', Package::class);
@@ -24,6 +77,82 @@ class PackageController extends Controller
         );
     }
 
+    #[OA\Post(
+        path: '/api/v1/packages',
+        operationId: 'v1.packages.store',
+        description: 'Route to favorite a package',
+        summary: 'API middleware route to favorite a package',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [new OA\Property(property: 'code', type: 'string', example: 'NL718729417BR')]
+            )
+        ),
+        tags: ['Packages'],
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Package favorited',
+                content: new OA\JsonContent(
+                    examples: [
+                        new OA\Examples(
+                            example: 'packageCreated',
+                            summary: 'Package favorited',
+                            description: 'Package favorited',
+                            value: [
+                                "code" => "NL718729417BR",
+                                "icon" => "default",
+                                "alias" => "NL718729417BR",
+                                "lastEventAt" => "2022-08-01T00:00:00.000000Z",
+                                "events" => [
+                                    [
+                                        "date" => "08/01/2022 00:00",
+                                        "location" => "São Paulo - SP",
+                                        "status" => "POSTED",
+                                        "message" => "Objeto postado",
+                                        "subStatus" => [],
+                                    ]
+                                ]
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Package not found or haven\'t been posted',
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Package code invalid or not provided',
+                content: new OA\JsonContent(
+                    examples: [
+                        new OA\Examples(
+                            example: 'validationError',
+                            summary: 'Validation error',
+                            description: 'Validation error',
+                            value: [
+                                "message" => "The given data was invalid.",
+                                "errors" => [
+                                    "code" => [
+                                        "The code is required.",
+                                    ]
+                                ]
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 503,
+                description: 'Service unavailable',
+            )
+        ]
+    )]
     public function store(StorePackageRequest $request, TrackerServiceInterface $trackerService)
     {
         $this->authorize('create', Package::class);
@@ -54,6 +183,100 @@ class PackageController extends Controller
         });
     }
 
+    #[OA\Patch(
+        path: '/api/v1/packages/{package}',
+        operationId: 'v1.packages.update',
+        description: 'Route to update a package meta information',
+        summary: 'API middleware route to update a package meta information',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'icon', type: 'string', enum: [
+                        'default',
+                        'clothing',
+                        'technology',
+                        'gift',
+                        'miscellaneous',
+                        'appliances',
+                    ], example: 'clothing'),
+                    new OA\Property(property: 'alias', type: 'string', example: 'My favorited package'),
+                ]
+            )
+        ),
+        tags: ['Packages'],
+        parameters: [
+            new OA\Parameter(
+                name: 'package',
+                description: 'Package code',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(description: 'Tracking package code', type: 'string', example: 'NL718729417BR'),
+                example: 'NL718729417BR'
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Package updated',
+                content: new OA\JsonContent(
+                    examples: [
+                        new OA\Examples(
+                            example: 'packageUpdated',
+                            summary: 'Package meta information updated',
+                            description: 'Package metadata updated',
+                            value: [
+                                "code" => "NL718729417BR",
+                                "icon" => "clothing",
+                                "alias" => "My favorite package",
+                                "lastEventAt" => "2022-08-01T00:00:00.000000Z",
+                                "events" => [
+                                    [
+                                        "date" => "08/01/2022 00:00",
+                                        "location" => "São Paulo - SP",
+                                        "status" => "POSTED",
+                                        "message" => "Objeto postado",
+                                        "subStatus" => [],
+                                    ]
+                                ]
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden',
+                content: new OA\JsonContent(
+                    example: [
+                        "message" => "You do not have access to this package, favorite it first",
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error',
+                content: new OA\JsonContent(
+                    example: [
+                        "message" => "The given data was invalid.",
+                        "errors" => [
+                            "icon" => [
+                                "The icon must be one of:" .
+                                " default, clothing, technology, gift, miscellaneous, appliances.",
+                            ],
+                            "alias" => [
+                                "The alias must be a string.",
+                            ]
+                        ]
+                    ]
+                )
+            )
+        ]
+    )]
     public function update(UpdatePackageRequest $request, Package $package)
     {
         Auth::user()
@@ -66,6 +289,59 @@ class PackageController extends Controller
         return new PackageResource(Auth::user()->packages()->where('code', $package->code)->first());
     }
 
+    #[OA\Get(
+        path: '/api/v1/packages/{package}',
+        operationId: 'v1.packages.show',
+        description: 'Route to show a package',
+        summary: 'API middleware route to show a package',
+        tags: ['Packages'],
+        parameters: [
+            new OA\Parameter(
+                name: 'package',
+                description: 'Package code',
+                in: 'path',
+                required: true,
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Package',
+                content: new OA\JsonContent(
+                    examples: [
+                        new OA\Examples(
+                            example: 'package',
+                            summary: 'Package show',
+                            description: 'User package',
+                            value: [
+                                "code" => "NL718729417BR",
+                                "icon" => "clothing",
+                                "alias" => "My favorite package",
+                                "lastEventAt" => "2022-08-01T00:00:00.000000Z",
+                                "events" => [
+                                    [
+                                        "date" => "08/01/2022 00:00",
+                                        "location" => "São Paulo - SP",
+                                        "status" => "POSTED",
+                                        "message" => "Objeto postado",
+                                        "subStatus" => [],
+                                    ]
+                                ]
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden',
+            )
+        ]
+    )]
     public function show(Package $package)
     {
         try {
@@ -81,12 +357,56 @@ class PackageController extends Controller
         }
     }
 
+    #[OA\Delete(
+        path: '/api/v1/packages/{package}',
+        operationId: 'v1.packages.destroy',
+        description: 'Route to unfavorite a package',
+        summary: 'API middleware route to unfavorite a package',
+        tags: ['Packages'],
+        parameters: [
+            new OA\Parameter(
+                name: 'package',
+                description: 'Package code',
+                in: 'path',
+                required: true,
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 204,
+                description: 'Package unfavored successfully'
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Package not found',
+            ),
+            new OA\Response(
+                response: 412,
+                description: 'Package not favorited',
+                content: new OA\JsonContent(
+                    example: [
+                        "message" => "We could not find this package, have you favorited it?",
+                    ]
+                )
+            )
+        ]
+    )]
     public function destroy(Package $package)
     {
-        $this->authorize('delete', $package);
+        try {
+            $this->authorize('delete', $package);
 
-        Auth::user()->unfavorite($package);
+            Auth::user()->unfavorite($package);
 
-        return response()->json([], 204);
+            return response()->json([], 204);
+        } catch (AuthorizationException $exception) {
+            return response()->json([
+                'message' => __('We could not find this package, have you favorited it?'),
+            ], Response::HTTP_PRECONDITION_FAILED);
+        }
     }
 }
