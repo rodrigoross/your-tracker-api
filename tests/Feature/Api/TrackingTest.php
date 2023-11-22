@@ -4,11 +4,15 @@ namespace Tests\Feature\Api;
 
 use App\Services\Tracker\Contracts\TrackerServiceInterface;
 use App\Services\Tracker\Entities\Tracker;
+use App\Services\Tracker\Exceptions\PackageIsNotPostedException;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
 class TrackingTest extends TestCase
 {
+    use LazilyRefreshDatabase;
+
     /** @test */
     public function guests_can_track_packages()
     {
