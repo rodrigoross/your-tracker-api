@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PackageStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,6 +15,13 @@ class Package extends Model
 
     protected $fillable = [
         'code',
+        'status',
+        'last_event_at',
+    ];
+
+    protected $casts = [
+        'status' => PackageStatus::class,
+        'last_event_at' => 'datetime',
     ];
 
     public function getRouteKeyName(): string

@@ -10,6 +10,8 @@ return new class extends Migration {
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
+            $table->string('status')->default(\App\Enums\PackageStatus::ACTIVE->value);
+            $table->dateTime('last_event_at');
             $table->timestamps();
             $table->softDeletes();
         });

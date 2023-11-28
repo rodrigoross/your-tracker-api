@@ -24,6 +24,12 @@ class Event extends Model
         'subStatus' => 'array',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'package_id'
+    ];
+
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);

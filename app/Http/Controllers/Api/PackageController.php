@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\PackageIcon;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePackageRequest;
 use App\Http\Requests\UpdatePackageRequest;
@@ -117,7 +116,7 @@ class PackageController extends Controller
         return DB::transaction(function () use ($data) {
             $newPackage = Package::create([
                 'code' => $data->code,
-                'updated_at' => $data->lastEventAt,
+                'last_event_at' => $data->lastEventAt,
             ]);
 
             $newPackage->events()->createMany(
