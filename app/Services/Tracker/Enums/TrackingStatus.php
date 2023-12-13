@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\Log;
 
 enum TrackingStatus: string
 {
+    case ELECTRONIC_REVIEW = 'Informações eletrônicas enviadas para análise da autoridade aduaneira';
     case POSTED = 'Objeto postado';
     case INSPECTION = 'Encaminhado para fiscalização aduaneira';
     case PENDING = 'Fiscalização aduaneira concluída - aguardando pagamento';
     case PAYED = 'Pagamento confirmado';
     case RECEIVED = 'Objeto recebido pelos Correios do Brasil';
+    case EXITED = 'Saída do Centro Internacional';
     case IN_TRANSIT = 'Objeto encaminhado';
     case DELIVERING = 'Objeto saiu para entrega ao destinatário';
     case DELIVERED = 'Objeto entregue ao destinatário';
