@@ -1,4 +1,4 @@
-FROM phpswoole/swoole:5.0-php8.2-alpine
+FROM php:8.2-fpm-alpine
 
 ARG GID
 ARG UID
@@ -17,20 +17,22 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS curl-dev openssl-dev p
     postgresql-dev \
     linux-headers \
     shadow && \
-    \
     docker-php-ext-install \
     pcntl \
     pdo \
     pdo_pgsql \
-    sockets && \
-    pecl install inotify && \
-    docker-php-ext-enable inotify && \
-    apk del .build-deps
+    sockets
 
 # Configure some extensions
 RUN apk add --no-cache libzip-dev
 RUN docker-php-ext-configure zip
 RUN docker-php-ext-install -j "$(nproc)" zip
+
+RUN pecl install xdebug-3.2.0 && \
+    docker-php-ext-enable xdebug && \
+    pecl clear-cache \
+    apk del .build-deps && \
+    apk del --purge autoconf g++ make
 
 WORKDIR /var/www/html
 
