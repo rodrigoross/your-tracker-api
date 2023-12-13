@@ -3,8 +3,8 @@
 namespace App\Jobs\Package;
 
 use App\Models\Package;
+use App\Notifications\PackageUpdatedNotification;
 use App\Services\Tracker\Contracts\TrackerServiceInterface;
-use App\Services\Tracker\Entities\Event;
 use App\Services\Tracker\Enums\TrackingStatus;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Notification;
 
 class UpdatePackageDataJob implements ShouldQueue
 {
@@ -60,6 +61,8 @@ class UpdatePackageDataJob implements ShouldQueue
             }
 
             $this->package->update($packageUpdateData);
+
+            Notification::send($this->package->users, new PackageUpdatedNotification($this->package));
         }
     }
 }

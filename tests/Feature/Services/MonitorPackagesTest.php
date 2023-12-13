@@ -7,13 +7,15 @@ use App\Jobs\Package\MonitorPackagesStatusesJob;
 use App\Jobs\Package\UpdatePackageDataJob;
 use App\Models\Event;
 use App\Models\Package;
+use App\Models\User;
+use App\Notifications\PackageUpdatedNotification;
 use App\Services\Tracker\Contracts\TrackerServiceInterface;
 use App\Services\Tracker\Entities\Tracker;
 use App\Services\Tracker\Enums\TrackingStatus;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Notification;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -88,13 +90,13 @@ class MonitorPackagesTest extends TestCase
         $package = Package::factory()
             ->has(
                 Event::factory()
-                ->state([
-                    'datetime' => '01/01/2022 00:00:00',
-                    'location' => 'São Paulo - SP',
-                    'status' => TrackingStatus::POSTED->value,
-                    'message' => 'Objeto postado',
-                    'subStatus' => [],
-                ])
+                    ->state([
+                        'datetime' => '01/01/2022 00:00:00',
+                        'location' => 'São Paulo - SP',
+                        'status' => TrackingStatus::POSTED->value,
+                        'message' => 'Objeto postado',
+                        'subStatus' => [],
+                    ])
             )
             ->state([
                 'code' => 'NL718729417BR',
@@ -109,5 +111,41 @@ class MonitorPackagesTest extends TestCase
         ]);
 
         $this->assertDatabaseCount('events', 2);
+    }
+
+    /** @test */
+    public function it_should_notify_users_of_package_updates()
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $package = Package::factory()
+            ->has(
+                Event::factory()
+                    ->state([
+                        'datetime' => '01/01/2022 00:00:00',
+                        'location' => 'São Paulo - SP',
+                        'status' => TrackingStatus::POSTED->value,
+                        'message' => 'Objeto postado',
+                        'subStatus' => [],
+                    ])
+            )
+            ->state([
+                'code' => 'NL718729417BR',
+                'last_event_at' => '2022-01-01T20:00:00.000000Z',
+            ])->create();
+
+        $user->favorite($package);
+
+        UpdatePackageDataJob::dispatch($package);
+
+        $this->assertDatabaseHas('packages', [
+            'id' => $package->id,
+            'status' => PackageStatus::COMPLETED->value
+        ]);
+
+        $this->assertDatabaseCount('events', 2);
+
+        Notification::assertSentTo([$user], PackageUpdatedNotification::class);
     }
 }
