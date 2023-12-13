@@ -20,8 +20,6 @@ Route::prefix('v1')
     ->name('v1.')
     ->group(function () {
        Route::get('/track', \App\Http\Controllers\TrackController::class)->name('track');
-
-       Route::apiResource('packages', \App\Http\Controllers\Api\PackageController::class);
     });
 
 Route::prefix('v1')
@@ -32,5 +30,7 @@ Route::prefix('v1')
         Route::get('/me', function () {
             return auth()->user();
         });
+
+        Route::apiResource('packages', \App\Http\Controllers\Api\PackageController::class);
     });
 

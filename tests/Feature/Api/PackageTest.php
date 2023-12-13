@@ -47,7 +47,7 @@ class PackageTest extends TestCase
     {
         $this->postJson(route('api.v1.packages.store'), $data = [
             'code' => 'NL718729417BR',
-        ])->assertForbidden();
+        ])->assertUnauthorized();
 
         $this->assertDatabaseMissing('packages', $data);
     }
@@ -55,7 +55,7 @@ class PackageTest extends TestCase
     /** @test */
     public function guest_users_can_not_list_favorited_packages()
     {
-        $this->getJson(route('api.v1.packages.index'))->assertForbidden();
+        $this->getJson(route('api.v1.packages.index'))->assertUnauthorized();
     }
 
     /** @test */
