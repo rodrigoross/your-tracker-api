@@ -13,7 +13,24 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::post('/auth', [\App\Http\Controllers\Api\AuthenticateController::class, 'login'])->name('login');
+Route::post('/register', [\App\Http\Controllers\Api\AuthenticateController::class, 'register'])->name('register');
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::prefix('v1')
+    ->name('v1.')
+    ->group(function () {
+       Route::get('/track', \App\Http\Controllers\TrackController::class)->name('track');
+    });
+
+Route::prefix('v1')
+    ->name('v1.')
+    ->middleware(['auth:sanctum'])
+    ->group(function () {
+
+        Route::get('/me', function () {
+            return auth()->user();
+        });
+
+        Route::apiResource('packages', \App\Http\Controllers\Api\PackageController::class);
+    });
+
