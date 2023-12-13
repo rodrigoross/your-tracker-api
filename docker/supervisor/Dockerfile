@@ -24,3 +24,5 @@ COPY ./conf.d/* /etc/supervisor/conf.d/
 COPY ./supervisor.conf /etc/supervisor/supervisord.conf
 
 ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisor/supervisord.conf"]
+
+EXPOSE 9000
