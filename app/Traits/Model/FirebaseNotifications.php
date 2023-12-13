@@ -7,7 +7,7 @@ namespace App\Traits\Model;
  */
 trait FirebaseNotifications
 {
-    public function initializeFirebaseNotificationsTrait(): void
+    public function initializeFirebaseNotifications(): void
     {
         $this->fillable[] = 'fcm_token';
     }
