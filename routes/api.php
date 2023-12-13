@@ -30,5 +30,7 @@ Route::prefix('v1')
         Route::get('/me', function () {
             return auth()->user();
         });
+
+        Route::apiResource('packages', \App\Http\Controllers\Api\PackageController::class);
     });
 

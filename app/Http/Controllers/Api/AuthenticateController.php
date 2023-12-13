@@ -73,6 +73,7 @@ class AuthenticateController extends Controller
             'email' => 'required|email',
             'password' => 'required',
             'device_name' => 'required',
+            'device_token' => 'required',
         ]);
 
         $user = User::where('email', $validated['email'])->first();
@@ -82,6 +83,10 @@ class AuthenticateController extends Controller
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
+
+        $user->update([
+            'fcm_token' => $validated['device_token']
+        ]);
 
         return response()->json([
             'user' => new UserResource($user),
