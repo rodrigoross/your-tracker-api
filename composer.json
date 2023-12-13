@@ -9,6 +9,7 @@
         "darkaonline/l5-swagger": "^8.5",
         "guzzlehttp/guzzle": "^7.2",
         "hhxsv5/laravel-s": "~3.7.0",
+        "laravel-notification-channels/fcm": "^4.0",
         "laravel/framework": "^10.10",
         "laravel/horizon": "^5.21",
         "laravel/sanctum": "^3.3",
